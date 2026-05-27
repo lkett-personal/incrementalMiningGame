@@ -268,3 +268,4 @@ tile_set = SubResource("TileSet_iywne")
 script = ExtResource("2_lnu2h")
 
 [node name="Camera" type="Camera2D" parent="." unique_id=1296978492]
+zoom = Vector2(0.5, 0.5)
