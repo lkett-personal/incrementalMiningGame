@@ -762,8 +762,16 @@ sources/0 = SubResource("TileSetAtlasSource_lbhrr")
 
 [node name="Game" type="Node2D" unique_id=116429217]
 
-[node name="Map" type="TileMapLayer" parent="." unique_id=1645359346]
+[node name="Map" type="TileMapLayer" parent="." unique_id=1645359346 node_paths=PackedStringArray("coins_label")]
 tile_set = SubResource("TileSet_iywne")
 script = ExtResource("2_lnu2h")
+coins_label = NodePath("../CanvasLayer/CoinsLabel")
 
 [node name="Camera" type="Camera2D" parent="." unique_id=1296978492]
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=989784589]
+
+[node name="CoinsLabel" type="Label" parent="CanvasLayer" unique_id=90297175]
+offset_right = 1.0
+offset_bottom = 23.0
+vertical_alignment = 1

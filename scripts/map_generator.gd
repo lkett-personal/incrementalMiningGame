@@ -1,5 +1,7 @@
 extends TileMapLayer
 
+@export var coins_label: Label
+
 const TERRAINS = {
 	"DIRT": 0,
 	"CLAY": 1,
@@ -68,9 +70,21 @@ const LAYERS = {
 	}
 }
 
+const ORE_VALUES = {
+	Vector2i(1, 12): 1,
+	Vector2i(2, 12): 2,
+	Vector2i(3, 12): 4,
+	Vector2i(5, 12): 8,
+	Vector2i(9, 12): 16
+}
+
 var tile_health: Dictionary[Vector2i, int] = {}
 var broken_tiles: Dictionary[Vector2i, Array] = {}
 var tile_terrain: Dictionary[Vector2i, int] = {}
+
+var ore_tiles: Dictionary[Vector2i, int] = {}
+
+var coins: int = 0
 
 var map_width: int = 16
 var map_height: int = 16
@@ -80,9 +94,11 @@ var mine_cooldown: float = 0.1
 
 var variation_noise := FastNoiseLite.new()
 
-var current_layer = "MAGMA"
+var current_layer = "CAVERN"
 
 func _ready() -> void:
+	update_ui()
+	
 	variation_noise.seed = randi()
 	variation_noise.frequency = 0.05
 
@@ -110,7 +126,6 @@ func generate_tile_data(cell: Vector2i) -> Dictionary:
 		variation_noise.get_noise_2d(cell.x, cell.y) + 1.0
 	) / 2.0
 
-	# allows terrain mutation over time
 	noise_val += randf_range(-0.2, 0.2)
 	noise_val = clamp(noise_val, 0.0, 1.0)
 
@@ -123,7 +138,16 @@ func generate_tile_data(cell: Vector2i) -> Dictionary:
 			terrain_id = TERRAINS[terrain_name]
 			break
 
-	var is_ore = randf() <= layer_data["ore_chance"]
+	var ore_valid_terrains = [
+		TERRAINS["STONE"],
+		TERRAINS["FUNGAL_STONE"],
+		TERRAINS["BASALT"]
+	]
+
+	var is_ore = (
+		terrain_id in ore_valid_terrains
+		and randf() <= layer_data["ore_chance"]
+	)
 
 	var ore_atlas = null
 
@@ -182,6 +206,8 @@ func generate_tile(
 		set_cells_terrain_connect([cell], 0, terrain_id)
 	else:
 		set_cell(cell, 0, ore_atlas)
+
+		ore_tiles[cell] = ORE_VALUES.get(ore_atlas, 1)
 
 func refill_tile(cell: Vector2i) -> void:
 	var tile_data = generate_tile_data(cell)
@@ -266,6 +292,13 @@ func damage_tile(cell: Vector2i, damage: int) -> void:
 		animate_tile(cell)
 
 func break_tile(cell: Vector2i) -> void:
+	if cell in ore_tiles:
+		coins += ore_tiles[cell]
+
+		update_ui()
+
+		ore_tiles.erase(cell)
+
 	var terrain_id = tile_terrain.get(cell, -1)
 
 	tile_health.erase(cell)
@@ -291,3 +324,6 @@ func get_tile_health(cell: Vector2i) -> int:
 		return tile_health[cell]
 
 	return -1
+	
+func update_ui() -> void:
+	coins_label.text = "coins: " + str(coins)
