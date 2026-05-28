@@ -1,0 +1,14 @@
+[gd_scene format=3 uid="uid://dwot8agnlvqa8"]
+
+[ext_resource type="Script" uid="uid://cup6awlaurige" path="res://scripts/damage_indicator.gd" id="1_2sglj"]
+[ext_resource type="FontFile" uid="uid://dggjabiu8vn01" path="res://styles/Kenney Mini.ttf" id="2_ltrgt"]
+
+[node name="DamageIndicator" type="Node2D" unique_id=1595915745]
+script = ExtResource("1_2sglj")
+
+[node name="Label" type="Label" parent="." unique_id=1401533613]
+offset_right = 40.0
+offset_bottom = 23.0
+theme_override_fonts/font = ExtResource("2_ltrgt")
+horizontal_alignment = 1
+vertical_alignment = 1
